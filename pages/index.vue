@@ -1,70 +1,40 @@
 <template>
-  <div class="container">
-    <div>
-      <Logo />
-      <h1 class="title">nuxt-lab</h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
-    </div>
-  </div>
+  <main>
+    <article>
+      <h3>Validation</h3>
+      <ValidationExample />
+    </article>
+
+    <article>
+      <h3>Extend Reactive</h3>
+      <!-- <ExtendReactiveExample /> -->
+    </article>
+
+    <article>
+      <h3>Promise Builder</h3>
+      <PromiseBuilderExample />
+    </article>
+
+    <article>
+      <h3>Promise Snapshot</h3>
+      <PromiseSnapshotExample />
+    </article>
+  </main>
 </template>
 
-<script lang="ts">
-import Vue from 'vue'
+<script>
+import ValidationExample from '../components/ValidationExample.vue'
+// // import ExtendReactiveExample from '../components/ExtendReactiveExample.vue'
+import PromiseBuilderExample from '../components/PromiseBuilderExample.vue'
+import PromiseSnapshotExample from '../components/PromiseSnapshotExample.vue'
 
-export default Vue.extend({})
+export default {
+  name: 'App',
+  components: {
+    ValidationExample,
+    // ExtendReactiveExample,
+    PromiseBuilderExample,
+    PromiseSnapshotExample,
+  },
+}
 </script>
-
-<style>
-/* Sample `apply` at-rules with Tailwind CSS
-.container {
-@apply min-h-screen flex justify-center items-center text-center mx-auto;
-}
-*/
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
-}
-</style>

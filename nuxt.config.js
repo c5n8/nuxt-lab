@@ -34,7 +34,7 @@ export default {
    ** Plugins to load before mounting the App
    ** https://nuxtjs.org/guide/plugins
    */
-  plugins: [],
+  plugins: ['~/plugins/composition-api'],
   /*
    ** Auto import components
    ** See https://nuxtjs.org/api/configuration-components
@@ -48,7 +48,7 @@ export default {
     // Doc: https://github.com/nuxt-community/stylelint-module
     '@nuxtjs/stylelint-module',
     // Doc: https://github.com/nuxt-community/nuxt-tailwindcss
-    '@nuxtjs/tailwindcss',
+    // '@nuxtjs/tailwindcss',
   ],
   /*
    ** Nuxt.js modules
