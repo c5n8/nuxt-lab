@@ -1,63 +1,140 @@
 import { reactive, computed } from '@vue/composition-api'
+import { extend } from './extend-reactive'
 
 export default useValidation
 
-export function useValidation<Data>(data: Data, rule: Rule<Data>): Validation {
-  const state: Validation = reactive({
-    isValid: computed(
-      () =>
+export function useValidation<
+  D extends { [key: string]: any },
+  R extends Rule<D>
+>(data: D, rule: R) {
+  const state: Validation<D, R> = reactive({
+    isValid: computed(() => {
+      return (
         Object.values(state.result).some((result) => result.isInvalid) === false
-    ),
-    isInvalid: computed(() => state.isValid === false),
+      )
+    }),
+
+    isInvalid: computed(() => {
+      return state.isValid === false
+    }),
+
+    errors: computed(() => {
+      return Object.values(state.result).reduce<string[]>(
+        (errors, result) => [...errors, ...result.errors],
+        []
+      )
+    }),
+
     result: computed(() =>
-      Object.keys({ ...data, ...rule }).reduce((result, key) => {
-        const value = (<any>data)[key] ?? null
+      Object.keys({ ...data, ...rule }).reduce<Result<D, R>>((result, key) => {
+        const value = data[key] ?? null
 
-        if (typeof rule[key] === 'function') {
-          const error = rule[key](value, key, data)
+        if (Array.isArray(rule[key])) {
+          const validatorArray = rule[key] as Validator<D>[]
 
-          if (typeof error === 'string') {
-            result[key] = {
-              value,
-              error,
-              isValid: false,
-              isInvalid: true,
+          const errors = validatorArray.reduce<string[]>(
+            (errors, validator) => {
+              const validatorResult = validator(value, key, data)
+
+              if (typeof validatorResult === 'string') {
+                return [...errors, validatorResult]
+              }
+
+              return errors
+            },
+            []
+          )
+
+          if (errors.length > 0) {
+            return {
+              ...result,
+              [key]: extend(
+                {
+                  errors,
+                },
+                {
+                  value,
+                  error: errors[0],
+                  isValid: false,
+                  isInvalid: true,
+                }
+              ),
             }
-
-            return result
           }
         }
 
-        result[key] = {
-          value,
-          error: null,
-          isValid: true,
-          isInvalid: false,
+        if (typeof rule[key] === 'function') {
+          const validatorFn = rule[key] as Validator<D>
+          const validatorResult = validatorFn(value, key, data)
+
+          if (typeof validatorResult === 'string') {
+            return {
+              ...result,
+              [key]: extend(
+                {
+                  errors: [validatorResult],
+                },
+                {
+                  value,
+                  error: validatorResult,
+                  isValid: false,
+                  isInvalid: true,
+                }
+              ),
+            }
+          }
         }
 
-        return result
-      }, <Result>{})
+        return {
+          ...result,
+          [key]: extend(
+            {
+              errors: [],
+            },
+            {
+              value,
+              error: null,
+              isValid: true,
+              isInvalid: false,
+            }
+          ),
+        }
+      }, <Result<D, R>>{})
     ),
   })
 
   return state
 }
 
-interface Validation {
+interface Validation<D, R> {
   isValid: boolean
   isInvalid: boolean
-  result: Result
+  result: Result<D, R>
 }
 
-interface Rule<Data> {
-  [key: string]: (value: any, key: string, data: Data) => string | true
-}
-
-interface Result {
-  [key: string]: {
-    value: any
-    error: string | null
-    isValid: boolean
-    isInvalid: boolean
+type Result<D, R> = {
+  [key: string]: ResultField
+} & {
+  [K in keyof D]: ResultField
+} &
+  {
+    [K in keyof R]: ResultField
   }
+
+type ResultField = {
+  value: any
+  error: string | null
+  errors: string[]
+  isValid: boolean
+  isInvalid: boolean
 }
+
+type Rule<D> = {
+  [key: string]: RuleField<D>
+} & {
+  [K in keyof D]?: RuleField<D>
+}
+
+type RuleField<D> = Validator<D> | Validator<D>[]
+
+type Validator<D> = (value: any, key: string, data: D) => string | any

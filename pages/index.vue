@@ -29,7 +29,6 @@ import PromiseBuilderExample from '../components/PromiseBuilderExample.vue'
 import PromiseSnapshotExample from '../components/PromiseSnapshotExample.vue'
 
 export default {
-  name: 'App',
   components: {
     ValidationExample,
     // ExtendReactiveExample,
