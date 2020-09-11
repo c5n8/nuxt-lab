@@ -31,6 +31,13 @@
         {{ validation.result.maxAgePreference.error }}
       </div>
     </label>
+    <label>
+      <div>Debt</div>
+      <input v-model.number="data.debt" type="number" />
+      <div v-if="validation.result.debt.isInvalid">
+        {{ validation.result.debt.error }}
+      </div>
+    </label>
 
     <div>
       <pre>{{ validation }}</pre>
@@ -40,7 +47,8 @@
 
 <script lang="ts">
 import { reactive } from '@vue/composition-api'
-import { useValidation } from '../libs/use-validation'
+import { useValidation } from '../libs/vue-use-validation'
+import { max } from '../libs/vue-use-validation/validators-formattable'
 
 export default {
   setup() {
@@ -51,19 +59,26 @@ export default {
       age: 0,
       location: '',
       sex: '',
+      debt: 0,
     })
 
     const validation = useValidation(data, {
-      // bruh: () => 'bruh',
-      zone: () => {
-        throw new Error('zone')
-      },
-      location: [
-        // () => 'fuck what tha fak is going on here, please halp',
-        () => {
-          throw new Error('location')
-        },
+      bruh: [],
+      debt: [
+        max(3).format((_, key) => (limit) =>
+          `${key} tidak boleh lebih dari ${limit}`
+        ),
       ],
+      // bruh: () => 'bruh',
+      // zone: () => {
+      //   throw new Error('zone')
+      // },
+      // location: [
+      //   // () => 'fuck what tha fak is going on here, please halp',
+      //   () => {
+      //     throw new Error('location')
+      //   },
+      // ],
       name: (value, key) => {
         if (value == null) {
           throw new Error(`${key} is required`)
@@ -122,7 +137,7 @@ export default {
       },
     })
 
-    // validation.result.name.
+    // validation.result.
 
     return {
       data,
