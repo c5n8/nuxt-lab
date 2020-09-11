@@ -63,11 +63,16 @@ export default {
     })
 
     const validation = useValidation(data, {
-      bruh: [],
+      // debt: max(3).format((_, key) => (limit) =>
+      //   `${key} ga boleh lebih dari ${limit}`
+      // ),
       debt: [
         max(3).format((_, key) => (limit) =>
           `${key} tidak boleh lebih dari ${limit}`
         ),
+        () => {
+          throw new Error('zone')
+        },
       ],
       // bruh: () => 'bruh',
       // zone: () => {
@@ -137,7 +142,7 @@ export default {
       },
     })
 
-    // validation.result.
+    // validation.
 
     return {
       data,
