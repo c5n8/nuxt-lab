@@ -1,21 +1,21 @@
 <template>
   <main>
-    <article>
+    <article v-if="true">
       <h3>Validation</h3>
       <ValidationExample />
     </article>
 
-    <article>
+    <article v-if="false">
       <h3>Extend Reactive</h3>
-      <!-- <ExtendReactiveExample /> -->
+      <ExtendReactiveExample />
     </article>
 
-    <article>
+    <article v-if="false">
       <h3>Promise Builder</h3>
       <PromiseBuilderExample />
     </article>
 
-    <article>
+    <article v-if="false">
       <h3>Promise Snapshot</h3>
       <PromiseSnapshotExample />
     </article>

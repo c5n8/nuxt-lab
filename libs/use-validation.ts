@@ -8,42 +8,35 @@ export function useValidation<
   R extends Rule<D>
 >(data: D, rule: R) {
   const state: Validation<D, R> = reactive({
-    isValid: computed(() => {
-      return (
+    isPassed: computed(
+      () =>
         Object.values(state.result).some((result) => result.isInvalid) === false
-      )
-    }),
+    ),
 
-    isInvalid: computed(() => {
-      return state.isValid === false
-    }),
+    isFailed: computed(() => state.isPassed === false),
 
-    errors: computed(() => {
-      return Object.values(state.result).reduce<string[]>(
+    errors: computed(() =>
+      Object.values(state.result).reduce<string[]>(
         (errors, result) => [...errors, ...result.errors],
         []
       )
-    }),
+    ),
 
     result: computed(() =>
       Object.keys({ ...data, ...rule }).reduce<Result<D, R>>((result, key) => {
-        const value = data[key] ?? null
+        const value = data[key]
 
         if (Array.isArray(rule[key])) {
-          const validatorArray = rule[key] as Validator<D>[]
+          const validators = <Validator<D>[]>rule[key]
+          const errors = validators.reduce<string[]>((errors, validator) => {
+            try {
+              validator(value, key, data)
+            } catch (error) {
+              return [...errors, error.message]
+            }
 
-          const errors = validatorArray.reduce<string[]>(
-            (errors, validator) => {
-              const validatorResult = validator(value, key, data)
-
-              if (typeof validatorResult === 'string') {
-                return [...errors, validatorResult]
-              }
-
-              return errors
-            },
-            []
-          )
+            return errors
+          }, [])
 
           if (errors.length > 0) {
             return {
@@ -64,19 +57,20 @@ export function useValidation<
         }
 
         if (typeof rule[key] === 'function') {
-          const validatorFn = rule[key] as Validator<D>
-          const validatorResult = validatorFn(value, key, data)
+          const validator = <Validator<D>>rule[key]
 
-          if (typeof validatorResult === 'string') {
+          try {
+            validator(value, key, data)
+          } catch (error) {
             return {
               ...result,
               [key]: extend(
                 {
-                  errors: [validatorResult],
+                  errors: [error.message],
                 },
                 {
                   value,
-                  error: validatorResult,
+                  error: error.message,
                   isValid: false,
                   isInvalid: true,
                 }
@@ -107,8 +101,8 @@ export function useValidation<
 }
 
 interface Validation<D, R> {
-  isValid: boolean
-  isInvalid: boolean
+  isPassed: boolean
+  isFailed: boolean
   result: Result<D, R>
 }
 

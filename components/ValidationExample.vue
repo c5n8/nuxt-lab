@@ -55,10 +55,14 @@ export default {
 
     const validation = useValidation(data, {
       // bruh: () => 'bruh',
-      zone: () => true,
+      zone: () => {
+        throw new Error('zone')
+      },
       location: [
         // () => 'fuck what tha fak is going on here, please halp',
-        () => true,
+        () => {
+          throw new Error('location')
+        },
       ],
       name: (value, key) => {
         if (value == null) {
@@ -66,59 +70,59 @@ export default {
         }
 
         if (typeof value !== 'string') {
-          return `${key} must be string`
+          throw new TypeError(`${key} must be string`)
         }
 
         if (value.length === 0) {
-          return `${key} must not be empty`
+          throw new Error(`${key} must not be empty`)
         }
 
         if (value !== 'chabib') {
-          return `${key} must be chabib`
+          throw new Error(`${key} must be chabib`)
         }
       },
       minAgePreference: (value, key, data) => {
         if (value == null) {
-          return `${key} is required`
+          throw new Error(`${key} is required`)
         }
 
         if (typeof value !== 'number') {
-          return `${key} must be number`
+          throw new TypeError(`${key} must be number`)
         }
 
         if (value > data.maxAgePreference) {
-          return `${key} can not be more than max age preference`
+          throw new Error(`${key} can not be more than max age preference`)
         }
       },
       maxAgePreference: (value, key, data) => {
         if (value == null) {
-          return `${key} is required`
+          throw new Error(`${key} is required`)
         }
 
         if (typeof value !== 'number') {
-          return `${key} must be number`
+          throw new TypeError(`${key} must be number`)
         }
 
         if (value < data.minAgePreference) {
-          return `${key} can not be less than min age preference`
+          throw new Error(`${key} can not be less than min age preference`)
         }
       },
       age: (value: number, key) => {
         if (value == null) {
-          return `${key} is required`
+          throw new Error(`${key} is required`)
         }
 
         if (typeof value !== 'number') {
-          return `${key} must be number`
+          throw new TypeError(`${key} must be number`)
         }
 
         if (value < 18) {
-          return 'Too young'
+          throw new Error('Too young')
         }
       },
     })
 
-    // validation.result.
+    // validation.result.name.
 
     return {
       data,

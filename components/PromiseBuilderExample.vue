@@ -28,13 +28,13 @@
 </template>
 
 <script>
-import { PromiseBuilder } from 'vue-promise-builder'
+// import { PromiseBuilder } from 'vue-promise-builder'
 import { sample, random } from 'lodash-es'
 
 export default {
-  components: {
-    PromiseBuilder,
-  },
+  // components: {
+  //   PromiseBuilder,
+  // },
 
   data() {
     return {
