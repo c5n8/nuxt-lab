@@ -5,8 +5,8 @@ export default useValidation
 
 export function useValidation<
   D extends { [key: string]: any },
-  R extends RuleMap<D>
->(data: D, ruleMap: R) {
+  R extends Rule<D>
+>(data: D, rule: R) {
   const state: Validation<D, R> = reactive({
     isPassed: computed(
       () =>
@@ -23,49 +23,13 @@ export function useValidation<
     ),
 
     result: computed(() =>
-      Object.keys({ ...data, ...ruleMap }).reduce<ResultMap<D, R>>(
-        (result, key) => {
-          const value = data[key]
-          const rule = ruleMap[key]
+      Object.keys({ ...data, ...rule }).reduce<Result<D, R>>((result, key) => {
+        const value = data[key]
+        const ruleField = rule[key]
 
-          if (rule != null && Array.isArray(rule)) {
-            const validators = <(Validator<D> | FormattableValidator)[]>rule
-            const errors = validators.reduce<string[]>((errors, validator) => {
-              try {
-                if (typeof validator === 'function') {
-                  ;(<Validator<D>>validator)(value, key, data)
-                } else if ('validate' in validator) {
-                  ;(<FormattableValidator>validator).validate(value, key, data)
-                }
-              } catch (error) {
-                return [...errors, error.message]
-              }
-
-              return errors
-            }, [])
-
-            if (errors.length > 0) {
-              return {
-                ...result,
-                [key]: extend(
-                  {
-                    errors,
-                  },
-                  {
-                    key,
-                    value,
-                    error: errors[0],
-                    isValid: false,
-                    isInvalid: true,
-                  }
-                ),
-              }
-            }
-          }
-
-          if (rule != null) {
-            const validator = rule
-
+        if (ruleField != null && Array.isArray(ruleField)) {
+          const validators = <(Validator<D> | FormattableValidator)[]>ruleField
+          const errors = validators.reduce<string[]>((errors, validator) => {
             try {
               if (typeof validator === 'function') {
                 ;(<Validator<D>>validator)(value, key, data)
@@ -73,42 +37,75 @@ export function useValidation<
                 ;(<FormattableValidator>validator).validate(value, key, data)
               }
             } catch (error) {
-              return {
-                ...result,
-                [key]: extend(
-                  {
-                    errors: [error.message],
-                  },
-                  {
-                    key,
-                    value,
-                    error: error.message,
-                    isValid: false,
-                    isInvalid: true,
-                  }
-                ),
-              }
+              return [...errors, error.message]
+            }
+
+            return errors
+          }, [])
+
+          if (errors.length > 0) {
+            return {
+              ...result,
+              [key]: extend(
+                {
+                  errors,
+                },
+                {
+                  key,
+                  value,
+                  error: errors[0],
+                  isValid: false,
+                  isInvalid: true,
+                }
+              ),
             }
           }
+        }
 
-          return {
-            ...result,
-            [key]: extend(
-              {
-                errors: [],
-              },
-              {
-                key,
-                value,
-                error: null,
-                isValid: true,
-                isInvalid: false,
-              }
-            ),
+        if (ruleField != null) {
+          const validator = ruleField
+
+          try {
+            if (typeof validator === 'function') {
+              ;(<Validator<D>>validator)(value, key, data)
+            } else if ('validate' in validator) {
+              ;(<FormattableValidator>validator).validate(value, key, data)
+            }
+          } catch (error) {
+            return {
+              ...result,
+              [key]: extend(
+                {
+                  errors: [error.message],
+                },
+                {
+                  key,
+                  value,
+                  error: error.message,
+                  isValid: false,
+                  isInvalid: true,
+                }
+              ),
+            }
           }
-        },
-        <ResultMap<D, R>>{}
-      )
+        }
+
+        return {
+          ...result,
+          [key]: extend(
+            {
+              errors: [],
+            },
+            {
+              key,
+              value,
+              error: null,
+              isValid: true,
+              isInvalid: false,
+            }
+          ),
+        }
+      }, <Result<D, R>>{})
     ),
   })
 
@@ -121,19 +118,19 @@ interface Validation<D, R> {
   isPassed: boolean
   isFailed: boolean
   errors: string[]
-  result: ResultMap<D, R>
+  result: Result<D, R>
 }
 
-type ResultMap<D, R> = {
-  [key: string]: Result
+type Result<D, R> = {
+  [key: string]: ResultField
 } & {
-  [K in keyof D]: Result
+  [K in keyof D]: ResultField
 } &
   {
-    [K in keyof R]: Result
+    [K in keyof R]: ResultField
   }
 
-type Result = {
+type ResultField = {
   key: string
   value: any
   error: string | null
@@ -142,13 +139,13 @@ type Result = {
   isInvalid: boolean
 }
 
-type RuleMap<D> = {
-  [key: string]: Rule<D>
+type Rule<D> = {
+  [key: string]: RuleField<D>
 } & {
-  [K in keyof D]?: Rule<D>
+  [K in keyof D]?: RuleField<D>
 }
 
-type Rule<D> =
+type RuleField<D> =
   | Validator<D>
   | FormattableValidator
   | (Validator<D> | FormattableValidator)[]

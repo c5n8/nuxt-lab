@@ -48,7 +48,7 @@
 <script lang="ts">
 import { reactive } from '@vue/composition-api'
 import { useValidation } from '../libs/vue-use-validation'
-import { max } from '../libs/vue-use-validation/validators-formattable'
+import { max } from '../libs/vue-use-validation/validators/formattable'
 
 export default {
   setup() {

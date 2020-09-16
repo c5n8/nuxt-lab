@@ -27,6 +27,8 @@
     "@vue/composition-api": "^1.0.0-beta.11",
     "lodash-es": "^4.17.15",
     "nuxt": "^2.14.0",
+    "nuxt-i18n": "^6.15.1",
+    "validator": "^13.1.1",
     "vue-promise-builder": "^1.0.5",
     "vue-promise-snapshot": "^1.0.2"
   },
@@ -38,6 +40,7 @@
     "@nuxtjs/eslint-module": "^2.0.0",
     "@nuxtjs/stylelint-module": "^4.0.0",
     "@nuxtjs/tailwindcss": "^2.1.0",
+    "@types/validator": "^13.1.0",
     "@vue/test-utils": "^1.0.3",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",

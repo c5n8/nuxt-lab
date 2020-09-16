@@ -31,7 +31,7 @@ export default <NuxtConfig>{
     // '@nuxtjs/tailwindcss',
   ],
 
-  modules: ['@nuxtjs/pwa'],
+  modules: ['@nuxtjs/pwa', 'nuxt-i18n'],
 
   build: {},
 }

@@ -1,8 +1,13 @@
 <template>
   <main>
-    <article v-if="true">
+    <article v-if="false">
       <h3>Validation</h3>
       <ValidationExample />
+    </article>
+
+    <article v-if="true">
+      <h3>Value Check</h3>
+      <ValueCheckExample />
     </article>
 
     <article v-if="false">
@@ -24,6 +29,7 @@
 
 <script>
 import ValidationExample from '../components/ValidationExample.vue'
+import ValueCheckExample from '../components/ValueCheckExample.vue'
 // // import ExtendReactiveExample from '../components/ExtendReactiveExample.vue'
 import PromiseBuilderExample from '../components/PromiseBuilderExample.vue'
 import PromiseSnapshotExample from '../components/PromiseSnapshotExample.vue'
@@ -31,6 +37,7 @@ import PromiseSnapshotExample from '../components/PromiseSnapshotExample.vue'
 export default {
   components: {
     ValidationExample,
+    ValueCheckExample,
     // ExtendReactiveExample,
     PromiseBuilderExample,
     PromiseSnapshotExample,
