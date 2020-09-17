@@ -5,7 +5,7 @@
       <ValidationExample />
     </article>
 
-    <article v-if="true">
+    <article v-if="false">
       <h3>Value Check</h3>
       <ValueCheckExample />
     </article>
@@ -20,7 +20,7 @@
       <PromiseBuilderExample />
     </article>
 
-    <article v-if="false">
+    <article v-if="true">
       <h3>Promise Snapshot</h3>
       <PromiseSnapshotExample />
     </article>

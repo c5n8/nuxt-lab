@@ -25,19 +25,27 @@
   </section>
 </template>
 
-<script>
-import { usePromise } from 'vue-promise-snapshot'
+<script lang="ts">
+// import { usePromise } from 'vue-promise-snapshot'
 import { sample, random } from 'lodash-es'
+import { usePromise } from '~/libs/use-promise'
 
 export default {
   setup() {
     const calculation = usePromise()
 
     async function startCalculation() {
+      // calculation.promise = calculate()
+      // await calculation.promise
+      // await calculation.start(calculate())
+
       try {
+        // await calculation.promise
         await calculation.start(calculate())
+        // const res = await calculation.start(calculate())
+        // return res
       } catch (error) {
-        //
+        console.error(error)
       }
     }
 
