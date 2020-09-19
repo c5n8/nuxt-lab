@@ -24,14 +24,14 @@ export default {
     isPending() {
       return this.status === 'pending'
     },
+    isSettled() {
+      return ['fulfilled', 'rejected'].includes(this.status)
+    },
     isFulfilled() {
-      return this.status === 'fulfilled'
+      return this.isSettled ? this.status === 'fulfilled' : undefined
     },
     isRejected() {
-      return this.status === 'rejected'
-    },
-    isSettled() {
-      return this.isFulfilled || this.isRejected
+      return this.isSettled ? this.status === 'rejected' : undefined
     },
     hasResult() {
       return this.isSettled ? this.result != null : undefined

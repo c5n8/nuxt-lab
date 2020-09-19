@@ -20,7 +20,8 @@
 </template>
 
 <script>
-import { usePromiseSnapshot } from 'vue-promise-snapshot'
+// import { usePromiseSnapshot } from 'vue-promise-snapshot'
+import { usePromiseSnapshot } from '~/libs/use-promise-snapshot'
 
 export default {
   setup() {

@@ -3,85 +3,101 @@ import { extend } from 'vue-extend-reactive'
 
 export default useAsyncFunction
 
-export function useAsyncFunction<F extends (...args: any[]) => any, R>(
-  fn: F
-): PromiseSnapshot<F, R> {
-  const props: Props<R> = reactive({
+export function useAsyncFunction<
+  F extends (...args: any[]) => Promise<Unpacked<ReturnType<F>>>
+>(fn: F): PromiseSnapshot<F> {
+  const state: State<F> = reactive({
     error: undefined,
     result: undefined,
     status: 'standby',
   })
 
   const getters: Getters = reactive({
-    isStandby: computed(() => props.status === 'standby'),
-    isPending: computed(() => props.status === 'pending'),
-    isFulfilled: computed(() => props.status === 'fulfilled'),
-    isRejected: computed(() => props.status === 'rejected'),
-    isSettled: computed(() => getters.isFulfilled || getters.isRejected),
+    isStandby: computed(() => state.status === 'standby'),
+    isPending: computed(() => state.status === 'pending'),
+    isSettled: computed(() => ['fulfilled', 'rejected'].includes(state.status)),
+    isFulfilled: computed(() =>
+      getters.isSettled ? state.status === 'fulfilled' : undefined
+    ),
+    isRejected: computed(() =>
+      getters.isSettled ? state.status === 'rejected' : undefined
+    ),
     hasResult: computed(() =>
-      getters.isSettled ? props.result != null : undefined
+      getters.isSettled ? state.result != null : undefined
     ),
     hasError: computed(() =>
-      getters.isSettled ? props.error != null : undefined
+      getters.isSettled ? state.error != null : undefined
     ),
   })
 
-  async function start(...args: Parameters<F>): Promise<R> {
-    props.error = undefined
-    props.result = undefined
-    props.status = 'pending'
+  async function start(
+    ...args: Parameters<F>
+  ): Promise<Unpacked<ReturnType<F>> | undefined> {
+    state.error = undefined
+    state.result = undefined
+    state.status = 'pending'
 
-    let result
+    let result: Unpacked<ReturnType<F>> | undefined
 
     try {
       result = await fn(...args)
     } catch (error) {
-      props.error = error
-      props.status = 'rejected'
+      state.error = error
+      state.status = 'rejected'
 
       throw error
     }
 
-    props.error = null
-    props.result = result
-    props.status = 'fulfilled'
+    state.error = null
+    state.result = result
+    state.status = 'fulfilled'
 
     return result
   }
 
-  return extend(extend(props, getters), <Methods<F>>{ start })
+  return extend(extend(state, getters), <Methods<F>>{
+    start,
+    exec: start,
+    run: start,
+    use: start,
+  })
 }
 
-interface PromiseSnapshot<F extends (...args: any[]) => any, R>
-  extends Props<R>,
+interface PromiseSnapshot<F extends AsyncFunction>
+  extends State<F>,
     Getters,
     Methods<F> {
   readonly error: any
-  readonly result: R | null | undefined
+  readonly result: Unpacked<ReturnType<F>> | undefined
   readonly status: PromiseStatus
 }
 
-interface Props<R> {
+interface State<F extends AsyncFunction> {
   error: any
-  result: R | null | undefined
+  result: Unpacked<ReturnType<F>> | undefined
   status: PromiseStatus
 }
 
 interface Getters {
   readonly isStandby: boolean
   readonly isPending: boolean
-  readonly isFulfilled: boolean
-  readonly isRejected: boolean
   readonly isSettled: boolean
+  readonly isFulfilled: boolean | undefined
+  readonly isRejected: boolean | undefined
   readonly hasResult: boolean | undefined
   readonly hasError: boolean | undefined
 }
 
-interface Methods<F extends (...args: any[]) => any> {
-  start(...args: Parameters<F>): Promise<Unpacked<ReturnType<F>>>
+interface Methods<F extends AsyncFunction> {
+  start(...args: Parameters<F>): ReturnType<F>
+  exec(...args: Parameters<F>): ReturnType<F>
+  run(...args: Parameters<F>): ReturnType<F>
+  use(...args: Parameters<F>): ReturnType<F>
 }
 
 type PromiseStatus = 'standby' | 'pending' | 'fulfilled' | 'rejected'
+
+type AsyncFunction = (...args: any[]) => Promise<unknown>
 
 type Unpacked<T> = T extends (infer U)[]
   ? U

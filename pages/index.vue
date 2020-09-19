@@ -24,6 +24,11 @@
       <h3>Promise Snapshot</h3>
       <PromiseSnapshotExample />
     </article>
+
+    <article v-if="false">
+      <h3>Async Function</h3>
+      <AsyncFunctionExample />
+    </article>
   </main>
 </template>
 

@@ -19,9 +19,13 @@ export function usePromiseSnapshot<R>(): PromiseSnapshot<R> {
   const getters: Getters = reactive({
     isStandby: computed(() => state.status === 'standby'),
     isPending: computed(() => state.status === 'pending'),
-    isFulfilled: computed(() => state.status === 'fulfilled'),
-    isRejected: computed(() => state.status === 'rejected'),
-    isSettled: computed(() => getters.isFulfilled || getters.isRejected),
+    isSettled: computed(() => ['fulfilled', 'rejected'].includes(state.status)),
+    isFulfilled: computed(() =>
+      getters.isSettled ? state.status === 'fulfilled' : undefined
+    ),
+    isRejected: computed(() =>
+      getters.isSettled ? state.status === 'rejected' : undefined
+    ),
     hasResult: computed(() =>
       getters.isSettled ? state.result != null : undefined
     ),
@@ -67,7 +71,12 @@ export function usePromiseSnapshot<R>(): PromiseSnapshot<R> {
     }
   )
 
-  return extend(extend(extend(state, props), getters), <Methods>{ start })
+  return extend(extend(extend(state, props), getters), <Methods>{
+    start,
+    exec: start,
+    run: start,
+    use: start,
+  })
 }
 
 interface PromiseSnapshot<R> extends Props<R>, State<R>, Getters, Methods {
@@ -89,15 +98,18 @@ interface State<R> {
 interface Getters {
   readonly isStandby: boolean
   readonly isPending: boolean
-  readonly isFulfilled: boolean
-  readonly isRejected: boolean
   readonly isSettled: boolean
+  readonly isFulfilled: boolean | undefined
+  readonly isRejected: boolean | undefined
   readonly hasResult: boolean | undefined
   readonly hasError: boolean | undefined
 }
 
 interface Methods {
   start<T>(promise: Promise<T>): Promise<T>
+  exec<T>(promise: Promise<T>): Promise<T>
+  run<T>(promise: Promise<T>): Promise<T>
+  use<T>(promise: Promise<T>): Promise<T>
 }
 
 type PromiseStatus = 'standby' | 'pending' | 'fulfilled' | 'rejected'
