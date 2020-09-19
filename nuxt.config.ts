@@ -1,9 +1,7 @@
 import { NuxtConfig } from '@nuxt/types'
 
 export default <NuxtConfig>{
-  mode: 'universal',
-
-  target: 'server',
+  ssr: false,
 
   head: {
     title: process.env.npm_package_name || '',
@@ -19,8 +17,6 @@ export default <NuxtConfig>{
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
 
-  css: [],
-
   plugins: ['~/plugins/composition-api'],
 
   components: true,
@@ -31,7 +27,8 @@ export default <NuxtConfig>{
     // '@nuxtjs/tailwindcss',
   ],
 
-  modules: ['@nuxtjs/pwa', 'nuxt-i18n'],
-
-  build: {},
+  modules: [
+    // '@nuxtjs/pwa',
+    // 'nuxt-i18n',
+  ],
 }

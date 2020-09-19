@@ -1,70 +1,67 @@
 <template>
   <section>
-    <template v-if="calculation.isStandby">
+    <div v-if="generation.isStandby">
       <div>Generate number 1-1000</div>
-      <div>
-        <button @click="startCalculation()">Start</button>
-      </div>
-    </template>
+      <button @click="generate()">Start</button>
+    </div>
 
-    <template v-if="calculation.isPending">
-      <div>Generating...</div>
-    </template>
-    <template v-else-if="calculation.isFulfilled">
-      <div>{{ calculation.result }}</div>
-    </template>
-    <template v-else-if="calculation.isRejected">
-      <div>{{ calculation.error }}</div>
-    </template>
+    <div v-if="generation.isPending">Generating...</div>
+    <div v-else-if="generation.isFulfilled">
+      {{ generation.result }}
+    </div>
+    <div v-else-if="generation.isRejected">
+      {{ generation.error }}
+    </div>
 
-    <template v-if="calculation.isSettled">
-      <div>
-        <button @click="startCalculation()">Retry</button>
-      </div>
-    </template>
+    <div v-if="generation.isSettled">
+      <button @click="generate()">Retry</button>
+    </div>
   </section>
 </template>
 
-<script lang="ts">
-// import { usePromise } from 'vue-promise-snapshot'
-import { sample, random } from 'lodash-es'
-import { usePromise } from '~/libs/use-promise'
+<script>
+import { usePromiseSnapshot } from 'vue-promise-snapshot'
 
 export default {
   setup() {
-    const calculation = usePromise()
+    const generation = usePromiseSnapshot()
 
-    async function startCalculation() {
-      // calculation.promise = calculate()
-      // await calculation.promise
-      // await calculation.start(calculate())
+    async function generate() {
+      generation.promise = _generate()
 
       try {
-        // await calculation.promise
-        await calculation.start(calculate())
-        // const res = await calculation.start(calculate())
-        // return res
+        await generation.promise
       } catch (error) {
-        console.error(error)
+        //
       }
     }
 
+    // You can also use start method to get one-liner and type hints
+
+    // async function generate() {
+    //   try {
+    //     await generation.start(_generate())
+    //   } catch (error) {
+    //     //
+    //   }
+    // }
+
     return {
-      calculation,
-      startCalculation,
+      generation,
+      generate,
     }
   },
 }
 
-export async function calculate() {
-  const duration = random(200, 2000)
+async function _generate() {
+  const random = (min, max) =>
+    Math.floor(Math.random() * Math.floor(max - min + 1)) + parseInt(min)
+  await new Promise((resolve) => setTimeout(resolve, random(200, 2000)))
 
-  await new Promise((resolve) => setTimeout(resolve, duration))
-
-  if (sample([true, false])) {
+  if (random(0, 1)) {
     throw new Error('Failed to generate')
   }
 
-  return random(0, 1000)
+  return random(1, 1000)
 }
 </script>

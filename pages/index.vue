@@ -15,12 +15,12 @@
       <ExtendReactiveExample />
     </article>
 
-    <article v-if="false">
+    <article v-if="true">
       <h3>Promise Builder</h3>
       <PromiseBuilderExample />
     </article>
 
-    <article v-if="true">
+    <article v-if="false">
       <h3>Promise Snapshot</h3>
       <PromiseSnapshotExample />
     </article>

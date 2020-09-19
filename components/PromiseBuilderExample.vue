@@ -1,69 +1,68 @@
 <template>
-  <PromiseBuilder #default="snapshot" :promise="calculation">
+  <PromiseBuilder #default="snapshot" :promise="generation">
     <section>
-      <template v-if="snapshot.isStandby">
+      <button @click="reset()">Reset</button>
+
+      <div v-if="snapshot.isStandby">
         <div>Generate number 1-1000</div>
-        <div>
-          <button @click="startCalculation()">Start</button>
-        </div>
-      </template>
+        <button @click="generate()">Start</button>
+      </div>
 
-      <template v-if="snapshot.isPending">
-        <div>Generating...</div>
-      </template>
-      <template v-else-if="snapshot.isFulfilled">
-        <div>{{ snapshot.result }}</div>
-      </template>
-      <template v-else-if="snapshot.isRejected">
-        <div>{{ snapshot.error }}</div>
-      </template>
+      <div v-if="snapshot.isPending">Generating...</div>
+      <div v-else-if="snapshot.isFulfilled">
+        {{ snapshot.result }}
+      </div>
+      <div v-else-if="snapshot.isRejected">
+        {{ snapshot.error }}
+      </div>
 
-      <template v-if="snapshot.isSettled">
-        <div>
-          <button @click="startCalculation()">Retry</button>
-        </div>
-      </template>
+      <div v-if="snapshot.isSettled">
+        <button @click="generate()">Retry</button>
+      </div>
     </section>
   </PromiseBuilder>
 </template>
 
 <script>
-// import { PromiseBuilder } from 'vue-promise-builder'
-import { sample, random } from 'lodash-es'
+import { PromiseBuilder } from 'vue-promise-builder'
 
 export default {
-  // components: {
-  //   PromiseBuilder,
-  // },
+  components: {
+    PromiseBuilder,
+  },
 
   data() {
     return {
-      calculation: null,
+      generation: null,
     }
   },
 
   methods: {
-    async startCalculation() {
-      this.calculation = calculate()
+    async generate() {
+      this.generation = _generate()
 
       try {
-        await this.calculation
+        await this.generation
       } catch (error) {
         //
       }
     },
+
+    reset() {
+      this.generation = null
+    },
   },
 }
 
-export async function calculate() {
-  const duration = random(200, 2000)
+async function _generate() {
+  const random = (min, max) =>
+    Math.floor(Math.random() * Math.floor(max - min + 1)) + parseInt(min)
+  await new Promise((resolve) => setTimeout(resolve, random(200, 2000)))
 
-  await new Promise((resolve) => setTimeout(resolve, duration))
-
-  if (sample([true, false])) {
+  if (random(0, 1)) {
     throw new Error('Failed to generate')
   }
 
-  return random(0, 1000)
+  return random(1, 1000)
 }
 </script>
