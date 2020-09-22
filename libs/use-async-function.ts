@@ -15,7 +15,9 @@ export function useAsyncFunction<
   const getters: Getters = reactive({
     isStandby: computed(() => state.status === 'standby'),
     isPending: computed(() => state.status === 'pending'),
-    isSettled: computed(() => ['fulfilled', 'rejected'].includes(state.status)),
+    isSettled: computed(
+      () => state.status === 'fulfilled' || state.status === 'rejected'
+    ),
     isFulfilled: computed(() =>
       getters.isSettled ? state.status === 'fulfilled' : undefined
     ),
@@ -57,9 +59,6 @@ export function useAsyncFunction<
 
   return extend(extend(state, getters), <Methods<F>>{
     start,
-    exec: start,
-    run: start,
-    use: start,
   })
 }
 
@@ -90,9 +89,6 @@ interface Getters {
 
 interface Methods<F extends AsyncFunction> {
   start(...args: Parameters<F>): ReturnType<F>
-  exec(...args: Parameters<F>): ReturnType<F>
-  run(...args: Parameters<F>): ReturnType<F>
-  use(...args: Parameters<F>): ReturnType<F>
 }
 
 type PromiseStatus = 'standby' | 'pending' | 'fulfilled' | 'rejected'

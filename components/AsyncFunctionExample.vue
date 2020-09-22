@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <div>
     <div v-if="generation.isStandby">
       <div>Generate number 1-1000</div>
       <button @click="generate()">Start</button>
@@ -16,7 +16,7 @@
     <div v-if="generation.isSettled">
       <button @click="generate()">Retry</button>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -24,14 +24,14 @@ import { useAsyncFunction } from '~/libs/use-async-function'
 
 export default {
   setup() {
-    const generation = useAsyncFunction(async () => {
+    const generation = useAsyncFunction(async (min, max) => {
       await new Promise((resolve) => setTimeout(resolve, random(200, 2000)))
 
       if (random(0, 1)) {
         throw new Error('Failed to generate')
       }
 
-      return random(1, 1000)
+      return random(min, max)
     })
 
     async function generate() {

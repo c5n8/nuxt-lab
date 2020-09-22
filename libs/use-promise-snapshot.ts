@@ -19,7 +19,9 @@ export function usePromiseSnapshot<R>(): PromiseSnapshot<R> {
   const getters: Getters = reactive({
     isStandby: computed(() => state.status === 'standby'),
     isPending: computed(() => state.status === 'pending'),
-    isSettled: computed(() => ['fulfilled', 'rejected'].includes(state.status)),
+    isSettled: computed(
+      () => state.status === 'fulfilled' || state.status === 'rejected'
+    ),
     isFulfilled: computed(() =>
       getters.isSettled ? state.status === 'fulfilled' : undefined
     ),
@@ -73,9 +75,6 @@ export function usePromiseSnapshot<R>(): PromiseSnapshot<R> {
 
   return extend(extend(extend(state, props), getters), <Methods>{
     start,
-    exec: start,
-    run: start,
-    use: start,
   })
 }
 
@@ -107,9 +106,6 @@ interface Getters {
 
 interface Methods {
   start<T>(promise: Promise<T>): Promise<T>
-  exec<T>(promise: Promise<T>): Promise<T>
-  run<T>(promise: Promise<T>): Promise<T>
-  use<T>(promise: Promise<T>): Promise<T>
 }
 
 type PromiseStatus = 'standby' | 'pending' | 'fulfilled' | 'rejected'

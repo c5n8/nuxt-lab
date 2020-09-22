@@ -31,7 +31,7 @@
     "nuxt-i18n": "^6.15.1",
     "validator": "^13.1.17",
     "vue-extend-reactive": "^1.1.3",
-    "vue-promise-builder": "^1.0.8",
+    "vue-promise-builder": "^1.0.10",
     "vue-promise-snapshot": "^1.1.3"
   },
   "devDependencies": {
